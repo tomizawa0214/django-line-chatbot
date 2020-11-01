@@ -1,7 +1,7 @@
-from django.urls import path, include
+from django.urls import path
+from .views import CallbackView
 
 urlpatterns = [
-    # path('callback/', include('app.urls')),
     path('callback', CallbackView.as_view(), name='callback_view'),
 ]
 
