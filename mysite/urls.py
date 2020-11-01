@@ -1,8 +1,7 @@
-from django.urls import path
-from .views import CallbackView
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
-    path('callback', CallbackView.as_view(), name='callback_view'),
+    path('admin/', admin.site.urls),
+    path('', include('app.urls')),
 ]
-
-# urlpatterns += static(settings.IMAGE_URL, document_root=settings.IMAGE_ROOT)

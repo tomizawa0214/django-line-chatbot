@@ -1,8 +1,8 @@
-from . import views
 from django.urls import path
+from .views import CallbackView
 
 app_name = 'app'
 
 urlpatterns = [
-    path('', views.callback, name='callback'),
+    path('callback', CallbackView.as_view(), name='callback_view'),
 ]
