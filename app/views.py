@@ -16,21 +16,31 @@ CHANNEL_SECRET = os.environ["CHANNEL_SECRET"]
 line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(CHANNEL_SECRET)
 
+class CallbackView(View):
+    def post(self, request, *args, **kwargs):
+        signature = request.META['HTTP_X_LINE_SIGNATURE']
+        body = request.body.decode('utf-8')
 
-@csrf_exempt
-def callback(request):
-    signature = request.META['HTTP_X_LINE_SIGNATURE']
-    body = request.body.decode('utf-8')
-    try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
-        HttpResponseForbidden()
-    return HttpResponse('OK', status=200)
+        try:
+            handler.handle(body, signature)
+        except InvalidSignatureError:
+            return HttpResponseBadRequest()
+        except LineBotApiError as e:
+            print(e)
+            return HttpResponseServerError()
+
+        return HttpResponse('OK')
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(CallbackView, self).dispatch(*args, **kwargs)
 
 
-# オウム返し
-@handler.add(MessageEvent, message=TextMessage)
-def handle_text_message(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=event.message.text))
+    # オウム返し
+    @staticmethod
+    @handler.add(MessageEvent, message=TextMessage)
+    def message_event(event):
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=event.message.text)
+        )
