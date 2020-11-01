@@ -3,6 +3,7 @@ from django.http import HttpResponseForbidden, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (InvalidSignatureError)
+from django.views.generic.base import View
 from linebot.models import (
     MessageEvent,
     TextMessage,
