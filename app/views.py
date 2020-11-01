@@ -29,7 +29,6 @@ class CallbackView(View):
         try:
             handler.handle(body, signature)
         except InvalidSignatureError:
-            print("エラーテスト")
             return HttpResponseBadRequest()
         except LineBotApiError as e:
             print(e)
@@ -46,6 +45,9 @@ class CallbackView(View):
     @staticmethod
     @handler.add(MessageEvent, message=TextMessage)
     def message_event(event):
+        if event.reply_token == "00000000000000000000000000000000":
+            return
+            
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=event.message.text)
