@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponse
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (InvalidSignatureError)
