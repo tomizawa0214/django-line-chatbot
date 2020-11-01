@@ -19,6 +19,9 @@ line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(CHANNEL_SECRET)
 
 class CallbackView(View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('OK')
+
     def post(self, request, *args, **kwargs):
         signature = request.META['HTTP_X_LINE_SIGNATURE']
         body = request.body.decode('utf-8')
