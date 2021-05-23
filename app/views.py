@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseServerError, JsonResponse
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
@@ -12,7 +12,6 @@ from linebot.models import (
 )
 import os
 import requests
-import json 
 
 
 CHANNEL_ACCESS_TOKEN = os.environ["CHANNEL_ACCESS_TOKEN"]
@@ -26,58 +25,49 @@ class CallbackView(View):
         return HttpResponse('OK')
 
     def post(self, request, *args, **kwargs):
-        print("ここはポストの最初ー－－－－")
-        ACCESS_TOKEN = "6cPp1IrvZ96x5dTrsxKe6OMxX7sgp2TcaroPN6wbJRH"
+        signature = request.META['HTTP_X_LINE_SIGNATURE']
+        body = request.body.decode('utf-8')
 
-        headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
+        try:
+            handler.handle(body, signature)
+        except InvalidSignatureError:
+            return HttpResponseBadRequest()
+        except LineBotApiError as e:
+            print(e)
+            return HttpResponseServerError()
 
-        data = {
-            "message": "こんにちは！\nLINE Notifyを使ってメッセージを送ってみたよ！"
-        }
+        return HttpResponse('OK')
 
-        requests.post(
-            "https://notify-api.line.me/api/notify",
-            headers=headers,
-            data=data,
-        )
+        # print("ここはポストの最初ー－－－－")
+        # ACCESS_TOKEN = "6cPp1IrvZ96x5dTrsxKe6OMxX7sgp2TcaroPN6wbJRH"
 
-        print("最後まで来たー－－－－")
+        # headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
-    def jsonReceive(request):
-        print("JSONのほうで来たー－－－")
-        json_str = requests.POST["data"]
-        json_data = json.loads(json_str)
-        json_data["data1"]#"DATA1"
-        json_data["data2"]#"DATA2"
-        return JsonResponse(json_data)
+        # data = {
+        #     "message": "こんにちは！\nLINE Notifyを使ってメッセージを送ってみたよ！"
+        # }
 
+        # requests.post(
+        #     "https://notify-api.line.me/api/notify",
+        #     headers=headers,
+        #     data=data,
+        # )
+        # print("最後まで来たー－－－－")
 
-    #     signature = request.META['HTTP_X_LINE_SIGNATURE']
-    #     body = request.body.decode('utf-8')
-
-    #     try:
-    #         handler.handle(body, signature)
-    #     except InvalidSignatureError:
-    #         return HttpResponseBadRequest()
-    #     except LineBotApiError as e:
-    #         print(e)
-    #         return HttpResponseServerError()
-
-    #     return HttpResponse('OK')
-
-    # @method_decorator(csrf_exempt)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(CallbackView, self).dispatch(*args, **kwargs)
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(CallbackView, self).dispatch(*args, **kwargs)
 
 
-    # # オウム返し
-    # @staticmethod
-    # @handler.add(MessageEvent, message=TextMessage)
-    # def message_event(event):
-    #     if event.reply_token == "00000000000000000000000000000000":
-    #         return
+    # オウム返し
+    @staticmethod
+    @handler.add(MessageEvent, message=TextMessage)
+    def message_event(event):
+        if event.reply_token == "00000000000000000000000000000000":
+            return
             
-    #     line_bot_api.reply_message(
-    #         event.reply_token,
-    #         TextSendMessage(text=event.message.text)
-    #     )
+        line_bot_api.reply_message(
+            event.reply_token,
+            # TextSendMessage(text=event.message.text)
+            TextSendMessage(text="商品情報が更新されたよー－－")
+        )
