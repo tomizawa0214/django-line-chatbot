@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseServerError, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
@@ -12,6 +12,7 @@ from linebot.models import (
 )
 import os
 import requests
+import json 
 
 
 CHANNEL_ACCESS_TOKEN = os.environ["CHANNEL_ACCESS_TOKEN"]
@@ -41,6 +42,14 @@ class CallbackView(View):
         )
 
         print("最後まで来たー－－－－")
+
+    def jsonReceive(request):
+        print("JSONのほうで来たー－－－")
+        json_str = requests.POST["data"]
+        json_data = json.loads(json_str)
+        json_data["data1"]#"DATA1"
+        json_data["data2"]#"DATA2"
+        return JsonResponse(json_data)
 
 
     #     signature = request.META['HTTP_X_LINE_SIGNATURE']
