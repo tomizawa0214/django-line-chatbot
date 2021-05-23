@@ -25,6 +25,7 @@ class CallbackView(View):
         return HttpResponse('OK')
 
     def post(self, request, *args, **kwargs):
+        print("ここはポストの最初ー－－－－")
         ACCESS_TOKEN = "6cPp1IrvZ96x5dTrsxKe6OMxX7sgp2TcaroPN6wbJRH"
 
         headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
@@ -38,6 +39,8 @@ class CallbackView(View):
             headers=headers,
             data=data,
         )
+
+        print("最後まで来たー－－－－")
 
 
     #     signature = request.META['HTTP_X_LINE_SIGNATURE']
